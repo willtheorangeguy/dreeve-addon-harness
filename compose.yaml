@@ -1,0 +1,99 @@
+name: ${COMPOSE_PROJECT_NAME:-dreeve-addon-harness}
+
+services:
+  app:
+    image: &dreeve ghcr.io/dreeveapp/dreeve@sha256:ba8bfe86c945a9f950f1aede3fe6fb9d37676fc9825eb659e14f0f88869050e8
+    environment: &app-env
+      IMPORT_MODE: files
+      APP_ENV: prod
+      TZ: UTC
+      APP_URL: ${PUBLIC_URL}
+      APP_SECRET: ${APP_SECRET}
+      ADMIN_USERNAME: ${DEMO_USERNAME}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH}
+      DREEVE_API_KEY: ${DREEVE_API_KEY}
+    ports: ['127.0.0.1:${APP_PORT}:8080']
+    volumes: &app-volumes
+      - build:/var/www/build
+      - database:/var/www/storage/database
+      - files:/var/www/storage/files
+      - ./watch:/var/www/watch
+      - ./scripts:/harness:ro
+    healthcheck:
+      test: [CMD, php, /harness/health.php]
+      interval: 3s
+      timeout: 10s
+      start_period: 10s
+      retries: 40
+
+  daemon:
+    image: *dreeve
+    environment: *app-env
+    volumes: *app-volumes
+    command: [bin/console, 'app:daemon:run']
+    depends_on:
+      app: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, php, /harness/health.php, daemon]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  seed:
+    build:
+      context: .
+      dockerfile: Dockerfile.tools
+    profiles: [tools]
+    environment: &runner-env
+      APP_URL: http://app:8080
+      PUBLIC_URL: ${PUBLIC_URL}
+      DREEVE_API_KEY: ${DREEVE_API_KEY}
+      SEED_END_DATE: ${SEED_END_DATE:-}
+      CHECK_EXAMPLE_ADDON: ${CHECK_EXAMPLE_ADDON:-true}
+      PYTHONPATH: /harness/scripts
+      PYTHONDONTWRITEBYTECODE: '1'
+    command: [python, seed.py]
+    volumes: &runner-volumes
+      - ./scripts:/harness/scripts:ro
+      - ./tests/integration:/harness/tests:ro
+      - ./runtime:/runtime
+      - ./reports:/reports
+      - ./watch:/watch
+    depends_on:
+      app: {condition: service_healthy}
+
+  example-addon:
+    build:
+      context: .
+      dockerfile: Dockerfile.tools
+    profiles: [addon]
+    environment: *runner-env
+    command: [python, addon.py]
+    volumes:
+      - ./scripts:/harness/scripts:ro
+      - ./runtime:/runtime:ro
+    ports: ['127.0.0.1:${ADDON_PORT}:8080']
+    depends_on:
+      app: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=5)"]
+      interval: 3s
+      timeout: 10s
+      retries: 15
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.tools
+    profiles: [tools]
+    environment:
+      <<: *runner-env
+      DEMO_USERNAME: ${DEMO_USERNAME}
+      DEMO_PASSWORD: ${DEMO_PASSWORD}
+    command: [python, /harness/tests/test_harness.py]
+    volumes: *runner-volumes
+
+volumes:
+  build:
+  database:
+  files:
