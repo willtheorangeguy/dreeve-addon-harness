@@ -1,0 +1,15 @@
+# Copy to compose.override.yaml and edit. Requires Compose v2.24.4+ for !reset.
+services:
+  example-addon:
+    image: dreeve-api-inspector:local
+    build:
+      context: ./addons/api-inspector
+      dockerfile: Dockerfile
+    command: !reset null
+    working_dir: !reset null
+    # Inherits APP_URL=http://app:8080, DREEVE_API_KEY, /runtime, and host port 9103 -> 8080.
+    # Mount the common watch directory if your addon exports activity files.
+    volumes:
+      - ./watch:/watch
+    # This supplied addon exposes /health, so the inherited readiness check works.
+    # Replace that check too if your own addon has a different health endpoint.
