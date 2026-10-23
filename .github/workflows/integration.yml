@@ -1,0 +1,39 @@
+name: Integration
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  controller:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests/unit -v
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python harness.py test
+      - name: Verify the supplied addon override
+        run: |
+          cp compose.addon.example.yaml compose.override.yaml
+          python harness.py up
+          python -c "import json, pathlib, urllib.request; data=json.load(urllib.request.urlopen('http://localhost:9103/')); assert data['implementation']=='api-inspector'; assert data['activity_count']==8; pathlib.Path('reports/override.json').write_text(json.dumps(data, indent=2))"
+      - if: failure()
+        run: docker compose --profile '*' logs --no-color > reports/compose.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-reports
+          path: reports/
+      - if: always()
+        run: python harness.py down
