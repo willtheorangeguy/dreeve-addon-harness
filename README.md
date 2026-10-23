@@ -43,6 +43,7 @@ startup if those ports are occupied. Services bind to loopback only.
 ## Usage
 
 ```sh
+python harness.py test-unit
 python harness.py test
 python harness.py status
 python harness.py logs
@@ -76,6 +77,14 @@ Your addon can use:
 
 See [addon development](docs/addons.md) for the override contract, mock-service
 examples, custom integration tests, and attaching another project's source tree.
+
+## Testing
+
+Run `python harness.py test-unit` for 42 host tests without Docker, then
+`python harness.py test` for 26 integration tests against the real application.
+The full workflow also verifies repeat seeding, persistence after restart, and a
+built replacement addon. CI runs host tests on Windows/Linux and Python 3.10/3.12.
+See [test coverage and reports](docs/testing.md) for the shared three-project standard.
 
 ## Documentation
 

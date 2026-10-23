@@ -1,7 +1,106 @@
-# Fixtures and test coverage
+# Testing
 
-Dreeve v5.6.2 is pinned to a specific multi-platform image digest. `upstream.json`
-records the matching upstream revision and deployment reference.
+All three addon harnesses use the same controller, API client, JUnit reporter,
+host unit suite, integration contract, and CI matrix. Platform adapters retain
+each application's authentication, fixtures, and API behavior.
+
+## Run the suites
+
+```sh
+python harness.py test-unit
+python harness.py test
+python harness.py test-override
+```
+
+`test-unit` runs 42 standard-library tests without Docker, `.env`, or host pip
+packages. They cover controller paths and overrides, secret generation and
+preservation, reset safeguards, failure diagnostics, HTTP authentication and
+cookies, JSON/multipart requests, pagination, and JUnit failure/error/skip reporting.
+The directory-symlink check skips on hosts that cannot create symlinks.
+
+`test` starts the real application stack, seeds twice and compares fixture IDs,
+dates and semantic values, then runs the containerized integration suite. It
+captures fixture state, restarts application services, waits for health, and
+compares persisted data again. Finally it builds the supplied standalone addon,
+replaces the running default addon, checks its real authenticated API results,
+and restores your original addon configuration. Each audit fails the command
+when values differ. Compose logs are collected even if startup or tests fail.
+
+`test-override` runs startup, reseed, and replacement-addon checks without the
+full integration suite or restart audit. Neither command changes your local
+`compose.override.yaml`. The supplied replacement is verified even when
+`CHECK_EXAMPLE_ADDON=false` skips assertions about a custom addon's interface.
+
+Local runs retain the sandbox for inspection. CI uses a fresh checkout and stops
+the stack after collecting reports. Round-trip tests delete the records they
+create and preserve the seeded history. These tests use synthetic data and local
+credentials. Frontend HTML and real HTTP login are tested; browser automation
+and production identity providers are outside this suite.
+
+## Shared coverage
+
+The 13 common integration tests check application health, frontend HTML, valid
+login with private-data access, invalid login, missing/invalid API credentials,
+authenticated fixture access, reseed equality, frozen dates, unique record IDs,
+addon snapshots, credential redaction, and missing-resource responses.
+
+| Harness | Host unit tests | Common integration tests | Platform integration tests | Total integration tests |
+| --- | --- | --- | --- | --- |
+| Dreeve | 42 | 13 | 13 | 26 |
+| wger | 42 | 13 | 10 | 23 |
+| SparkyFitness | 42 | 13 | 10 | 23 |
+
+Reseed, restart, and addon replacement are additional workflow gates. Their
+results are separate JSON reports rather than extra unittest cases.
+
+## Platform coverage
+
+The 13 Dreeve-specific tests cover eight seeded workouts across six sports,
+sensor streams and summary-only activities, pagination and invalid pagination,
+detail/list consistency, unsupported uploads and invalid edits, missing GPX for
+summary workouts, duplicate FIT replay, and watch-folder plus HTTP-upload imports
+through the real daemon. Imported records are read, patched and deleted.
+
+The daemon retains its five-minute schedule. Allow up to twelve minutes for the
+integration tests, plus initial image downloads/builds. Seed import uses Dreeve's
+explicit import command to make startup faster. See the [fixtures](#synthetic-dataset)
+for the exact synthetic workout values.
+
+## Reports
+
+| File under `reports/` | Contents |
+| --- | --- |
+| `unit.xml` | Host unit results, durations, failures, errors and skips |
+| `junit.xml` | Containerized integration results in the same format |
+| `api-snapshot.json` | Synthetic data read from the application's API |
+| `seed-before.json`, `seed-idempotence.json` | Fixture state and comparison after the second seed |
+| `restart-before.json`, `restart-idempotence.json` | Fixture state and comparison across application restart |
+| `override.json` | Data returned by the verified replacement addon |
+| `compose.log` | Compose diagnostics, collected on success and failure |
+
+Reports exclude runtime credentials. Keep generated `.env`, `runtime/`, reports
+and local addon checkouts out of Git. CI uploads reports even when checks fail.
+
+## Extend the suite
+
+Add host tests under `tests/unit/test_*.py` and HTTP integration tests under
+`tests/integration/test_*.py`. The shared runner discovers them and adds JUnit
+results automatically. Scripts and integration tests are mounted read-only into
+the test container. Preserve fixture dates and remove temporary API records in
+`finally` blocks so reruns remain useful.
+
+For a custom addon interface, set `CHECK_EXAMPLE_ADDON=false` in `.env` and add
+your own integration assertions. Application, authentication, persistence and
+supplied replacement-addon checks still run. Extend the Compose override with
+mock upstream services when your addon needs an external API.
+
+## CI matrix
+
+Every push and pull request runs host tests on Ubuntu and Windows with Python
+3.10 and 3.12, plus the full Docker workflow on Ubuntu/Python 3.12. Unit artifacts
+have a distinct name for each OS/Python combination. Integration reports are
+uploaded as `integration-reports`. The Docker job has a 30-minute timeout and
+always attempts sandbox shutdown.
 
 ## Synthetic dataset
 
@@ -22,35 +121,3 @@ FIT files are generated with `fit-tool` 0.9.16 and parsed by Dreeve's independen
 Go FIT decoder. Sensor samples are explicitly synthetic test data. Coordinates
 are omitted so tests do not depend on weather/geocoding services. Add your own
 route fixtures in an addon when testing GPS-specific features.
-
-## Integration checks
-
-`python harness.py test` checks the actual application, not a Dreeve mock:
-
-- API values, six sport mappings, sensor streams, and summary-only activities.
-- Rejection of missing and incorrect bearer tokens.
-- Admin login with a session cookie and CSRF token using the real demo password.
-- Example addon reads through Dreeve's authenticated HTTP API.
-- Re-uploading all eight seed FIT files creates skipped imports, not duplicate activities.
-- Both a watch-folder file and an HTTP upload are imported by the unchanged daemon.
-- Imported test activities can be read, patched, and deleted through the API.
-- Test activities are removed after the round trip; the eight seed workouts remain.
-
-The daemon uses its real five-minute cron schedule. Seed import is triggered explicitly
-to make initial startup quick; replay and round-trip test assertions wait for scheduled imports.
-Allow up to twelve minutes for tests and twenty-five minutes for a cold CI run.
-
-## Reports and host unit tests
-
-JUnit output and API snapshots are written to `reports/`. API snapshots contain
-synthetic workouts only, with no API keys or login passwords. `runtime/` contains
-the sandbox credentials and is not uploaded by CI.
-
-The host controller tests use Python's standard library and do not start Docker:
-
-```sh
-python -m unittest discover -s tests/unit -v
-```
-
-They cover credential generation, correct bcrypt quoting, preservation of an existing
-`.env`, automatic override inclusion, and safeguards around resetting generated data.

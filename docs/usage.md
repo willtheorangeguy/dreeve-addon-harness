@@ -5,7 +5,9 @@
 | `python harness.py init` | Generate `.env` and local folders without starting the stack |
 | `python harness.py up` | Start app/daemon, seed missing fixtures, verify the API, start the addon |
 | `python harness.py seed` | Recreate missing fixture activities and verify all seed values |
-| `python harness.py test` | Start/seed if needed and run containerized integration checks |
+| `python harness.py test-unit` | Run host unit tests without Docker |
+| `python harness.py test-override` | Verify reseeding and the supplied replacement addon |
+| `python harness.py test` | Verify reseeding, integration behavior, restart persistence, and addon replacement |
 | `python harness.py status` | Show all services, including stopped one-shot tools |
 | `python harness.py logs` | Follow the last 100 log lines for all services |
 | `python harness.py config` | Validate the merged Compose configuration without printing secrets |

@@ -13,7 +13,7 @@ cp compose.addon.example.yaml compose.override.yaml
 The supplied override builds the working standalone `addons/api-inspector` template.
 Try it unchanged first, then edit it to use your own image/source checkout. `harness.py` automatically
 includes it. Set `CHECK_EXAMPLE_ADDON=false` in `.env` if your addon does not expose
-the example's JSON interface. That skips only the example-addon assertion; real
+the example's JSON interface. That skips only the example-addon assertions; real
 Dreeve import, authentication, and round-trip checks remain enabled.
 
 The override replaces the service named `example-addon`, so the existing `up` and
@@ -89,3 +89,14 @@ For stateful upstream APIs, implement the required authentication and response
 sequence in a mock server. The Hadge connector's [HTTP mock and real Git fixture](https://github.com/willtheorangeguy/dreeve-hadge-connector/tree/v0.1.0/tests/integration)
 provide a concrete example for GitHub-backed addons. This harness remains usable
 for connectors that do not involve GitHub.
+
+## Run the supplied addon check
+
+```sh
+python harness.py test-override
+```
+
+This builds and runs `addons/api-inspector`, checks its distinct implementation
+marker and API snapshot, then restores your original addon. The full `test`
+command includes this check too. Add tests under `tests/integration/test_*.py`
+to retain the common JUnit runner while extending its coverage.
