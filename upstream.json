@@ -1,0 +1,9 @@
+{
+  "verified_on": "2026-10-23",
+  "source": "https://github.com/dreeveapp/dreeve",
+  "revision": "e5337d92f122a673f688580bab0d6be2798bb0a9",
+  "version": "v5.6.2",
+  "application_image": "ghcr.io/dreeveapp/dreeve@sha256:ba8bfe86c945a9f950f1aede3fe6fb9d37676fc9825eb659e14f0f88869050e8",
+  "deployment_reference": "https://docs.dreeve.app/getting-started/installation/",
+  "extracted_from": "https://github.com/willtheorangeguy/dreeve-hadge-connector/tree/v0.1.0/tests/integration"
+}

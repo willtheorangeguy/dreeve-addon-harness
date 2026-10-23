@@ -1,0 +1,8 @@
+.env
+compose.override.yaml
+runtime/
+reports/
+watch/
+__pycache__/
+*.pyc
+.venv/
