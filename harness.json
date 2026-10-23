@@ -1,0 +1,22 @@
+{
+  "platform": "dreeve",
+  "services": [
+    "app",
+    "daemon"
+  ],
+  "restart_services": [
+    "app",
+    "daemon"
+  ],
+  "build_services": [
+    "seed",
+    "test",
+    "example-addon"
+  ],
+  "seed_mode": "files",
+  "generated_dirs": [
+    "runtime",
+    "reports",
+    "watch"
+  ]
+}

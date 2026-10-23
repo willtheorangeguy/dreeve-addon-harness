@@ -97,7 +97,8 @@ class HarnessTests(unittest.TestCase):
         wait_for('daemon skips eight re-uploaded seed files', replayed)
         after = {a['id'] for a in api.activities()}
         self.assertTrue(before.issubset(after))
-        self.assertEqual(sum(a['name'].startswith('Harness ') for a in api.activities()), 8)
+        fixture_names = {item['name'] for item in manifest['fixtures']}
+        self.assertEqual(sum(a['name'] in fixture_names for a in api.activities()), 8)
 
     def test_watch_and_upload_roundtrip(self):
         # Both intake methods run through the unchanged real daemon, then API edit/delete.
@@ -136,36 +137,3 @@ class HarnessTests(unittest.TestCase):
                 with self.assertRaises(APIError) as caught:
                     api.request(path)
                 self.assertEqual(caught.exception.status, 404)
-
-
-class ReportResult(unittest.TextTestResult):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.cases = []
-
-    def startTest(self, test):
-        self.cases.append((test.id(), time.monotonic()))
-        super().startTest(test)
-
-
-if __name__ == '__main__':
-    suite = unittest.defaultTestLoader.loadTestsFromTestCase(HarnessTests)
-    result = unittest.TextTestRunner(verbosity=2, resultclass=ReportResult).run(suite)
-    root = ET.Element('testsuite', name='dreeve-addon-harness', tests=str(result.testsRun),
-                      failures=str(len(result.failures)), errors=str(len(result.errors)),
-                      skipped=str(len(result.skipped)))
-    failures = {test.id(): text for test, text in result.failures}
-    errors = {test.id(): text for test, text in result.errors}
-    skipped = {test.id(): reason for test, reason in result.skipped}
-    for test_id, _ in result.cases:
-        module, _, name = test_id.rpartition('.')
-        case = ET.SubElement(root, 'testcase', classname=module, name=name)
-        if test_id in failures:
-            ET.SubElement(case, 'failure').text = failures[test_id]
-        if test_id in errors:
-            ET.SubElement(case, 'error').text = errors[test_id]
-        if test_id in skipped:
-            ET.SubElement(case, 'skipped').text = skipped[test_id]
-    ET.ElementTree(root).write('/reports/junit.xml', encoding='unicode')
-    Path('/reports/api-snapshot.json').write_text(json.dumps(snapshot(), indent=2))
-    raise SystemExit(0 if result.wasSuccessful() else 1)

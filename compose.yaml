@@ -45,6 +45,8 @@ services:
       dockerfile: Dockerfile.tools
     profiles: [tools]
     environment: &runner-env
+      TARGET: dreeve
+      FRONTEND_URL: http://app:8080
       APP_URL: http://app:8080
       PUBLIC_URL: ${PUBLIC_URL}
       DREEVE_API_KEY: ${DREEVE_API_KEY}
@@ -90,7 +92,7 @@ services:
       <<: *runner-env
       DEMO_USERNAME: ${DEMO_USERNAME}
       DEMO_PASSWORD: ${DEMO_PASSWORD}
-    command: [python, /harness/tests/test_harness.py]
+    command: [python, /harness/tests/run.py]
     volumes: *runner-volumes
 
 volumes:
