@@ -29,7 +29,7 @@ have intentionally renamed/deleted fixture data, reset the sandbox for a fresh b
 ## Tests look idle
 
 Duplicate replay and new file imports wait for the real daemon schedule. Look for
-`Waiting:` and `Still waiting:` messages. Each wait has a six-minute deadline.
+`Waiting:` and `Still waiting:` messages. The shared wait helper defaults to 370 seconds.
 Inspect Dreeve's `/admin/file-imports` page for failed files and the daemon logs for cron jobs.
 
 ## Addon cannot connect

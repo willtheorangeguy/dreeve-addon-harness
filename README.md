@@ -2,7 +2,11 @@
 <h4 align="center">Run a seeded Dreeve Docker sandbox with a real API, example addon, and containerized integration tests.</h4>
 
 <p align="center">
+<img alt="Issues" src="https://img.shields.io/github/issues/willtheorangeguy/dreeve-addon-harness">
+<img alt="Pull requests" src="https://img.shields.io/github/issues-pr/willtheorangeguy/dreeve-addon-harness">
 <img alt="Integration" src="https://github.com/willtheorangeguy/dreeve-addon-harness/actions/workflows/integration.yml/badge.svg">
+<img alt="Docs" src="https://github.com/willtheorangeguy/dreeve-addon-harness/actions/workflows/docs.yml/badge.svg">
+<img alt="Docs lint" src="https://github.com/willtheorangeguy/dreeve-addon-harness/actions/workflows/docs-lint.yml/badge.svg">
 <img alt="License" src="https://img.shields.io/github/license/willtheorangeguy/dreeve-addon-harness">
 </p>
 
@@ -80,24 +84,26 @@ examples, custom integration tests, and attaching another project's source tree.
 
 ## Testing
 
-Run `python harness.py test-unit` for 42 host tests without Docker, then
-`python harness.py test` for 26 integration tests against the real application.
-The full workflow also verifies repeat seeding, persistence after restart, and a
-built replacement addon. CI runs host tests on Windows/Linux and Python 3.10/3.12.
-See [test coverage and reports](docs/testing.md) for the shared three-project standard.
+Run `python harness.py test-unit` for host tests, then `python harness.py test` for
+the full Docker workflow. See [test coverage and reports](docs/testing.md).
 
 ## Documentation
 
-[Getting started](docs/getting-started.md) · [Usage and configuration](docs/usage.md) ·
-[Addon development](docs/addons.md) · [Fixtures and test coverage](docs/testing.md) ·
-[Troubleshooting](docs/troubleshooting.md)
+Read the [documentation site](https://williamvdg.me/dreeve-addon-harness/) or browse
+[`docs/`](docs/index.md): [Getting started](docs/getting-started.md) ·
+[Configuration](docs/configuration.md) · [API](docs/api.md) · [Addon development](docs/addons.md).
 
-## Reports
+## Support
 
-`reports/junit.xml` contains integration results. `reports/api-snapshot.json`,
-`reports/roundtrip.json`, and `reports/compose.log` contain synthetic test evidence.
-GitHub Actions runs controller unit tests and the full Docker integration suite,
-uploads diagnostics even when checks fail, and stops its sandbox afterwards.
+Open a [GitHub Discussion](https://github.com/willtheorangeguy/dreeve-addon-harness/discussions/new) or file an [issue](https://github.com/willtheorangeguy/dreeve-addon-harness/issues/new/choose).
+
+## Contributing
+
+Contributions welcome. See the org-wide [Contributing Guide](https://github.com/willtheorangeguy/.github/blob/main/CONTRIBUTING.md) and [Code of Conduct](https://github.com/willtheorangeguy/.github/blob/main/CODE_OF_CONDUCT.md).
+
+## License
+
+MIT — see [`LICENSE.md`](LICENSE.md).
 
 ## Attribution
 

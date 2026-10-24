@@ -1,8 +1,12 @@
-# Usage and configuration
+# Usage
+
+The controller resolves paths relative to `harness.py`, so commands behave the same from another working directory. Every command except `test-unit` and argument-parser help initializes the sandbox first. A fresh `init`, `status`, or `config` therefore needs Docker to generate the bcrypt hash.
+
+## Commands
 
 | Command | Behavior |
 | --- | --- |
-| `python harness.py init` | Generate `.env` and local folders without starting the stack |
+| `python harness.py init` | Generate `.env` and local folders without starting the stack; uses Docker for bcrypt generation |
 | `python harness.py up` | Start app/daemon, seed missing fixtures, verify the API, start the addon |
 | `python harness.py seed` | Recreate missing fixture activities and verify all seed values |
 | `python harness.py test-unit` | Run host unit tests without Docker |
@@ -16,19 +20,7 @@
 
 ## Configuration
 
-| Variable | Default / meaning |
-| --- | --- |
-| `COMPOSE_PROJECT_NAME` | `dreeve-addon-harness`; use a unique value for another copy |
-| `APP_PORT` | Host loopback port `8103` |
-| `ADDON_PORT` | Host loopback port `9103` |
-| `PUBLIC_URL` | `http://localhost:8103`; change with `APP_PORT` |
-| `DEMO_USERNAME` | `demo` |
-| `DEMO_PASSWORD` | `HarnessDemo123!`; used by login tests |
-| `ADMIN_PASSWORD_HASH` | Generated bcrypt hash; quote it in `.env` |
-| `APP_SECRET` | Random signing secret generated on first use |
-| `DREEVE_API_KEY` | Generated `drv_` key with 64 hex characters |
-| `SEED_END_DATE` | Optional `YYYY-MM-DD`; otherwise freezes first seed's UTC date |
-| `CHECK_EXAMPLE_ADDON` | `true`; set `false` when replacing the example with a different API |
+See [configuration](./configuration.md) for environment variables, defaults, precedence, and examples. The [API reference](./api.md) describes CLI flags and HTTP interfaces.
 
 Do not commit `.env` or the generated `runtime`, `watch`, and `reports` directories.
 The convenience `runtime/credentials.json` is a credential for this sandbox.

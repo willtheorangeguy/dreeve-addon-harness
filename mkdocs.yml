@@ -1,0 +1,37 @@
+INHERIT: .mkdocs-shared/shared/mkdocs.base.yml
+
+site_name: Dreeve addon testing harness
+site_description: Run a seeded Dreeve Docker sandbox with a real API, example addon, and containerized integration tests.
+site_author: willtheorangeguy
+site_url: https://williamvdg.me/dreeve-addon-harness/
+repo_url: https://github.com/willtheorangeguy/dreeve-addon-harness
+repo_name: willtheorangeguy/dreeve-addon-harness
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; willtheorangeguy
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Installation: installation.md
+  - Usage: usage.md
+  - Configuration: configuration.md
+  - Architecture: architecture.md
+  - API: api.md
+  - Development:
+      - Development: development.md
+      - Addon development: addons.md
+      - Testing: testing.md
+      - CI/CD: ci-cd.md
+  - Help:
+      - FAQ: faq.md
+      - Troubleshooting: troubleshooting.md
+      - Roadmap and limitations: roadmap.md
+  - About:
+      - License: license.md
+      - Contributing: https://github.com/willtheorangeguy/.github/blob/main/CONTRIBUTING.md
+      - Code of conduct: https://github.com/willtheorangeguy/.github/blob/main/CODE_OF_CONDUCT.md
+      - Security: https://github.com/willtheorangeguy/.github/blob/main/SECURITY.md
+
+exclude_docs: |
+  docs.instructions.md
+  internal/

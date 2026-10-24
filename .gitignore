@@ -6,3 +6,15 @@ watch/
 __pycache__/
 *.pyc
 .venv/
+
+# Shared documentation build artifacts
+site/
+_docs_out/
+_site/
+.mkdocs-shared/
+docs/stylesheets/
+docs/javascript/
+docs/images/favicon.svg
+overrides/main.html
+overrides/partials/
+overrides/.icons/
