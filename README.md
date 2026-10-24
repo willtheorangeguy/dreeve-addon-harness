@@ -95,7 +95,7 @@ Read the [documentation site](https://williamvdg.me/dreeve-addon-harness/) or br
 
 ## Support
 
-Open a [GitHub Discussion](https://github.com/willtheorangeguy/dreeve-addon-harness/discussions/new) or file an [issue](https://github.com/willtheorangeguy/dreeve-addon-harness/issues/new/choose).
+File an [issue](https://github.com/willtheorangeguy/dreeve-addon-harness/issues/new/choose) with the command and redacted diagnostics.
 
 ## Contributing
 

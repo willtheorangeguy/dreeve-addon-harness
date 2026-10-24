@@ -47,4 +47,4 @@ Open [Dreeve](http://localhost:8103/admin/login) and sign in as `demo` with `Har
 
 ## Support
 
-Open a [GitHub Discussion](https://github.com/willtheorangeguy/dreeve-addon-harness/discussions/new) or file an [issue](https://github.com/willtheorangeguy/dreeve-addon-harness/issues/new/choose). Include the command, runtime versions, and redacted diagnostics. Keep `.env` and `runtime/credentials.json` private.
+File an [issue](https://github.com/willtheorangeguy/dreeve-addon-harness/issues/new/choose). Include the command, runtime versions, and redacted diagnostics. Keep `.env` and `runtime/credentials.json` private.
